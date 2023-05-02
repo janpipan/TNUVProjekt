@@ -3,8 +3,10 @@ package si.uni_lj.fe.tnuv.bt_simple;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -94,5 +96,15 @@ public class MainActivity extends AppCompatActivity implements ConnectionStatusL
     @Override
     public Context getContext() {
         return this;
+    }
+
+    public void startActivityWorkout(View view) {
+        Intent intent = new Intent(MainActivity.this,WorkoutActivity.class);
+        startActivity(intent);
+    }
+
+    public void startActivitySettings(View view) {
+        Intent intent = new Intent(MainActivity.this,SettingsActivity.class);
+        startActivity(intent);
     }
 }

@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">BT_simple</string>
+    <string name="workout">WORKOUT</string>
+    <string name="analysis">ANALYSIS</string>
+    <string name="settings">SETTINGS</string>
 </resources>
