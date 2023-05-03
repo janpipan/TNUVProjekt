@@ -1,3 +1,4 @@
+#sprobi to novo skripto, fora je da na zacetku ne poslje prvic celga file ampak zacne samo nove vrstice(ker bova itak na fonu hranila zgodovino)
 import bluetooth
 import os
 import time
@@ -11,7 +12,7 @@ def send_new_data(sock, file_path, last_sent_line):
             content = ''.join(new_lines) + "\n\n"
             sock.send(content.encode())
             return len(lines)
-        return last_sent_line
+    return last_sent_line
 
 server_sock = BluetoothSocket(RFCOMM)
 server_sock.bind(("", bluetooth.PORT_ANY))
@@ -30,7 +31,12 @@ try:
     # Replace 'example.txt' with your desired file path #
     file_path = r'C:\Users\Bildos\Desktop\VBT_app_data.txt'
     last_mod_time = os.path.getmtime(file_path)
-    last_sent_line = 0
+
+    # Get the initial number of lines in the file
+    with open(file_path, 'r') as file:
+        initial_lines = len(file.readlines())
+
+    last_sent_line = initial_lines
 
     while True:
         current_mod_time = os.path.getmtime(file_path)
@@ -50,3 +56,6 @@ print("Disconnected.")
 
 client_sock.close()
 server_sock.close()
+
+
+
