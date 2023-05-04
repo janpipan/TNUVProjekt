@@ -1,4 +1,3 @@
-#sprobi to novo skripto, fora je da na zacetku ne poslje prvic celga file ampak zacne samo nove vrstice(ker bova itak na fonu hranila zgodovino)
 import bluetooth
 import os
 import time
@@ -9,10 +8,12 @@ def send_new_data(sock, file_path, last_sent_line):
         lines = file.readlines()
         new_lines = lines[last_sent_line:]
         if new_lines:
-            content = ''.join(new_lines) + "\n\n"
-            sock.send(content.encode())
-            return len(lines)
-    return last_sent_line
+            content = ''.join(new_lines).strip()
+            if content:
+                print("Message sent:", content)
+                sock.send(content.encode())
+                return len(lines), True
+    return last_sent_line, False
 
 server_sock = BluetoothSocket(RFCOMM)
 server_sock.bind(("", bluetooth.PORT_ANY))
@@ -29,7 +30,7 @@ print("Accepted connection from", client_info)
 try:
 
     # Replace 'example.txt' with your desired file path #
-    file_path = r'./VBT_app_data.txt'
+    file_path = r'C:\Users\Bildos\Desktop\VBT_app_data.txt'
     last_mod_time = os.path.getmtime(file_path)
 
     # Get the initial number of lines in the file
@@ -41,8 +42,9 @@ try:
     while True:
         current_mod_time = os.path.getmtime(file_path)
         if current_mod_time != last_mod_time:
-            last_sent_line = send_new_data(client_sock, file_path, last_sent_line)
-            print("New data sent.")
+            last_sent_line, data_sent = send_new_data(client_sock, file_path, last_sent_line)
+            if data_sent:
+                print("New data sent.")
             last_mod_time = current_mod_time
 
         time.sleep(5)  # Adjust the sleep time to control how often the file is checked for changes
@@ -56,6 +58,3 @@ print("Disconnected.")
 
 client_sock.close()
 server_sock.close()
-
-
-
