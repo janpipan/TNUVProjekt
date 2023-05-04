@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import java.util.Set;
-public class MainActivity extends AppCompatActivity implements ConnectionStatusListener {
+public class MainActivity extends AppCompatActivity {
 
     private BluetoothAdapter bluetoothAdapter;
     private ArrayAdapter<String> deviceListAdapter;
@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionStatusL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
         receivedTextView = findViewById(R.id.received_text_view);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         ListView devicesListView = findViewById(R.id.devices_list_view);
@@ -47,8 +48,9 @@ public class MainActivity extends AppCompatActivity implements ConnectionStatusL
         });
 
         displayPairedDevices();
+        */
     }
-
+    /*
     private void displayPairedDevices() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements ConnectionStatusL
         }
     }
 
+     */
+    /*
     @Override
     public void onConnectionSuccess() {
         runOnUiThread(new Runnable() {
@@ -97,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionStatusL
     public Context getContext() {
         return this;
     }
-
+    */
     public void startActivityWorkout(View view) {
         Intent intent = new Intent(MainActivity.this,WorkoutActivity.class);
         startActivity(intent);

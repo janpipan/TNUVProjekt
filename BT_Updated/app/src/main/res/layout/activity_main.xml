@@ -13,12 +13,14 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         app:titleTextColor="@android:color/white"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:contentInsetStart="0dp"
+        app:contentInsetStartWithNavigation="0dp">
 
         <include layout="@layout/toolbar_items"/>
 
     </androidx.appcompat.widget.Toolbar>
-
+    <!--
     <Button
         android:id="@+id/search_button"
         android:layout_width="wrap_content"
@@ -28,18 +30,18 @@
     <ListView
         android:id="@+id/devices_list_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="20dp"
         android:layout_weight="1"
+        android:background="@color/purple_200"
         android:divider="@android:color/darker_gray"
-        android:dividerHeight="0.5dp"
-        android:background="@color/purple_200" />
+        android:dividerHeight="0.5dp" />
 
     <TextView
         android:id="@+id/received_text_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
         android:padding="8dp"
         android:textColor="@android:color/black"
         android:textSize="16sp"  />
-
+    -->
 </LinearLayout>
