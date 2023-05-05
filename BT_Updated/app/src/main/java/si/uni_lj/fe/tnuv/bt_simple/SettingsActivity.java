@@ -1,7 +1,9 @@
 package si.uni_lj.fe.tnuv.bt_simple;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -9,6 +11,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,12 +20,16 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Set;
 
 public class SettingsActivity extends AppCompatActivity implements ConnectionStatusListener{
 
     private BluetoothAdapter bluetoothAdapter;
 
+    private static final int PERMISSION_REQUEST_CODE = 1;
     private ArrayAdapter<String> deviceListAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,18 +42,33 @@ public class SettingsActivity extends AppCompatActivity implements ConnectionSta
         devicesListView.setAdapter(deviceListAdapter);
 
 
-        devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String deviceInfo = deviceListAdapter.getItem(position);
-                String address = deviceInfo.split(" - ")[1];
-                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-                ConnectThread connectThread = new ConnectThread(device, SettingsActivity.this);
-                connectThread.start();
-            }
-        });
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
+        }
 
+            devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String deviceInfo = deviceListAdapter.getItem(position);
+                    String address = deviceInfo.split(" - ")[1];
+                    BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
+                    ConnectThread connectThread = new ConnectThread(device, SettingsActivity.this);
+                    connectThread.start();
+                }
+            });
         displayPairedDevices();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
     }
 
     private void displayPairedDevices() {
@@ -83,11 +106,11 @@ public class SettingsActivity extends AppCompatActivity implements ConnectionSta
     }
 
     @Override
-    public void onUpdateTextView(final String message) {
+    public void onNewReceivedData(final String message) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(SettingsActivity.this, "message", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SettingsActivity.this, message, Toast.LENGTH_SHORT).show();
             }
         });
     }
