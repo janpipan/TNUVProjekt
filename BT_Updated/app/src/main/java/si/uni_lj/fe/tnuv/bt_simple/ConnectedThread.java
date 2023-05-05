@@ -1,8 +1,12 @@
 package si.uni_lj.fe.tnuv.bt_simple;
 
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -35,7 +39,8 @@ public class ConnectedThread extends Thread {
             while (true) {
                 String newContent = readTxtFileContent();
                 Log.d("ConnectedThread", "Received new content: " + newContent);
-                connectionStatusListener.onUpdateTextView(newContent);
+                writeToFile("bluetoothData.txt", newContent);
+                connectionStatusListener.onNewReceivedData(newContent);
             }
         } catch (IOException e) {
             Log.d("ConnectedThread", "Error occurred when reading input stream", e);
@@ -59,6 +64,27 @@ public class ConnectedThread extends Thread {
             }
         }
         return byteArrayOutputStream.toString("UTF-8");
+    }
+
+    private void writeToFile(String fileName, String content) {
+        // writes file to /storage/emulated/0/Android/data/si.uni_lj.fe.tnuv.bt_simple/files
+        // physical phone internalStorage/Android/data/si.uni_lj.fe.tnuv.bt_simple/files
+        File appSpecificExternalDir = connectionStatusListener.getContext().getExternalFilesDir(null);
+        File file = new File(appSpecificExternalDir, fileName);
+
+        /*
+        File parentDir = file.getParentFile();
+        String parentDirPath = parentDir.getAbsolutePath();
+        Log.d("WritingFileTo", "File was written to: " + parentDirPath);
+        */
+
+        try (FileOutputStream fos = new FileOutputStream(file, true)){
+            fos.write((content.replace("\n","") + "\n").getBytes());
+        } catch (IOException e){
+            Log.e("FileWrite", "Fail");
+            e.printStackTrace();
+        }
+
     }
 
     public void cancel() {

@@ -3,4 +3,6 @@
     <string name="workout">WORKOUT</string>
     <string name="analysis">ANALYSIS</string>
     <string name="settings">SETTINGS</string>
+    <string name="search_button">Search Paired Devices</string>
+    <string name="app_settings">SETTINGS</string>
 </resources>
