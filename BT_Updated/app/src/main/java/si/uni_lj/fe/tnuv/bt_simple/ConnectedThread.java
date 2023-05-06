@@ -75,13 +75,13 @@ public class ConnectedThread extends Thread {
         /*
         File parentDir = file.getParentFile();
         String parentDirPath = parentDir.getAbsolutePath();
-        Log.d("WritingFileTo", "File was written to: " + parentDirPath);
+        Log.d("ConnectedThread", "File was written to: " + parentDirPath);
         */
 
         try (FileOutputStream fos = new FileOutputStream(file, true)){
             fos.write((content.replace("\n","") + "\n").getBytes());
         } catch (IOException e){
-            Log.e("FileWrite", "Fail");
+            Log.e("ConnectedThread", "Failed to write to file");
             e.printStackTrace();
         }
 
