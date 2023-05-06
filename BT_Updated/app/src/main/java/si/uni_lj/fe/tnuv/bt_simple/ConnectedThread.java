@@ -81,17 +81,17 @@ public class ConnectedThread extends Thread {
         File appSpecificExternalDir = connectionStatusListener.getContext().getExternalFilesDir(null);
         File file = new File(appSpecificExternalDir, fileName);
 
-        /*
         File parentDir = file.getParentFile();
         String parentDirPath = parentDir.getAbsolutePath();
         Log.d("ConnectedThread", "File was written to: " + parentDirPath);
-        */
 
-        try (FileOutputStream fos = new FileOutputStream(file, true)){
-            fos.write((content.replace("\n","") + "\n").getBytes());
-        } catch (IOException e){
-            Log.e("ConnectedThread", "Failed to write to file");
-            e.printStackTrace();
+        try (FileOutputStream fos = new FileOutputStream(file, true)) {
+            // Write the content to the file
+            fos.write(content.getBytes());
+            fos.write("\n".getBytes());
+            Log.d("ConnectedThread", "Data successfully written to file: " + content);
+        } catch (IOException e) {
+            Log.e("ConnectedThread", "Failed to write to file", e);
         }
 
     }
