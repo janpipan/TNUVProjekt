@@ -6,5 +6,5 @@ public interface ConnectionStatusListener {
     Context getContext();
     void onConnectionSuccess();
     void onConnectionFailed();
-    void onUpdateTextView(String message);
+    void onNewReceivedData(String message);
 }

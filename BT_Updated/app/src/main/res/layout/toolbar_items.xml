@@ -11,7 +11,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/workout"
-        android:onClick="startActivityWorkout"/>
+        android:onClick="startActivityWorkout"
+        android:background="@android:color/transparent"/>
 
     <Button
         android:id="@+id/nav_analysis"
@@ -19,7 +20,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/analysis"
-        android:onClick="startActivityAnalysis"/>
+        android:onClick="startActivityAnalysis"
+        android:background="@android:color/transparent"/>
 
     <Button
         android:id="@+id/nav_settings"
@@ -27,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/settings"
-        android:onClick="startActivitySettings"/>
+        android:onClick="startActivitySettings"
+        android:background="@android:color/transparent"/>
 
 </LinearLayout>
