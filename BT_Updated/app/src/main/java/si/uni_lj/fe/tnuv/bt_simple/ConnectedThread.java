@@ -35,15 +35,24 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        try {
-            while (true) {
-                String newContent = readTxtFileContent();
-                Log.d("ConnectedThread", "Received new content: " + newContent);
-                writeToFile("bluetoothData.txt", newContent);
-                connectionStatusListener.onNewReceivedData(newContent);
+        byte[] buffer = new byte[1024];  // buffer store for the stream
+        int bytes; // bytes returned from read()
+
+        // Keep listening to the InputStream until an exception occurs
+        while (true) {
+            try {
+                // Read from the InputStream
+                bytes = inputStream.read(buffer);
+                if (bytes > 0) {
+                    String newContent = new String(buffer, 0, bytes, "UTF-8");
+                    Log.d("ConnectedThread", "Received new content: " + newContent);
+                    writeToFile("bluetoothData.txt", newContent);
+                    connectionStatusListener.onNewReceivedData(newContent);
+                }
+            } catch (IOException e) {
+                Log.d("ConnectedThread", "Error occurred when reading input stream", e);
+                break;
             }
-        } catch (IOException e) {
-            Log.d("ConnectedThread", "Error occurred when reading input stream", e);
         }
     }
 
