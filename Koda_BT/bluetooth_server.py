@@ -30,7 +30,7 @@ print("Accepted connection from", client_info)
 try:
 
     # Replace 'example.txt' with your desired file path #
-    file_path = r'C:\Users\Bildos\Desktop\VBT_app_data.txt'
+    file_path = r'.\VBT_app_data.txt'
     last_mod_time = os.path.getmtime(file_path)
 
     # Get the initial number of lines in the file
