@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="?attr/colorBackground">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -20,28 +21,47 @@
         <include layout="@layout/toolbar_items"/>
 
     </androidx.appcompat.widget.Toolbar>
-    <!--
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Search Paired Devices" />
 
-    <ListView
-        android:id="@+id/devices_list_view"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_weight="1"
-        android:background="@color/purple_200"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="0.5dp" />
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        />
 
-    <TextView
-        android:id="@+id/received_text_view"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:padding="8dp"
-        android:textColor="@android:color/black"
-        android:textSize="16sp"  />
-    -->
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:paddingBottom="10dp"
+        android:background="@color/white">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="DAILY READINESS"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="0.5dp"
+            android:background="@android:color/white"/>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 </LinearLayout>
