@@ -128,25 +128,32 @@ public class MainActivity extends AppCompatActivity {
         plotGraph();
     }
 
-void populateTableData() {
-    exerciseDataList.clear();
-    try {
-        Scanner scanner = new Scanner(file);
-        while (scanner.hasNextLine()) {
-            String line = scanner.nextLine();
-            String[] parts = line.split(",");
-            if (parts[0].equals(selectedExercise) && parts[5].equals("load_vel_profile")) {
-                float peakVelocity = Float.parseFloat(parts[2]);
-                float load = Float.parseFloat(parts[3]);
-                String percentageRM = parts[4];
-                exerciseDataList.add(new ExerciseData(peakVelocity, load, percentageRM));
+    void populateTableData() {
+        exerciseDataList.clear();
+        try {
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(",");
+                if (parts[0].equals(selectedExercise)) {
+                    String lastWord = parts[parts.length - 1];
+                    if (selectedExercise.equals("Poteg na Roke") && lastWord.equals("daily_readiness")) {
+                        continue; // Skip entries with "daily_readiness" for "Poteg na Roke"
+                    }
+                    if (lastWord.equals("load_vel_profile")) {
+                        float peakVelocity = Float.parseFloat(parts[2]);
+                        float load = Float.parseFloat(parts[3]);
+                        String percentageRM = parts[4];
+                        exerciseDataList.add(new ExerciseData(peakVelocity, load, percentageRM));
+                    }
+                }
             }
+            scanner.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        scanner.close();
-    } catch (IOException e) {
-        e.printStackTrace();
     }
-}
+
 
 
 
