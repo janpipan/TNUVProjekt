@@ -7,23 +7,34 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.FileObserver;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.MarkerView;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.EntryXComparator;
 
 import com.github.mikephil.charting.components.Description;
@@ -31,6 +42,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
+import com.github.mikephil.charting.utils.MPPointF;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,15 +57,21 @@ import java.util.Locale;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 import java.util.Set;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
     private LineChart chart;
     private List<Entry> entries = new ArrayList<>();
     private File file;
-    private DateFormat format = new SimpleDateFormat("d.MM.yyyy", Locale.getDefault());
+    private DateFormat format = new SimpleDateFormat("d.MM.yyyy/HH:mm:ss", Locale.getDefault());
+
     private float minPeakVelocity = Float.MAX_VALUE;
     private float maxPeakVelocity = Float.MIN_VALUE;
+    private FileObserver fileObserver;
+    private List<ExerciseData> exerciseDataList = new ArrayList<>();
+    private ExerciseDataAdapter exerciseDataAdapter;
+    private String selectedExercise;  // Declare as a class-level variable
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,16 +80,119 @@ public class MainActivity extends AppCompatActivity {
 
         chart = findViewById(R.id.chart);
         chart.setBackgroundColor(Color.WHITE);  // set chart's background color to white
+        chart.setExtraOffsets(0f, 10f, 0f, 10f);  // modify the offset values here
         file = new File(getExternalFilesDir(null), "bluetoothData.txt");
+
+        // Initialize RecyclerView and its adapter
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        exerciseDataAdapter = new ExerciseDataAdapter(exerciseDataList);
+        recyclerView.setAdapter(exerciseDataAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        Spinner spinner = findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.exercises_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedExercise = parent.getItemAtPosition(position).toString();
+                // When an exercise is selected, re-populate the table data and notify the adapter
+                populateTableData();
+                exerciseDataAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
+
+        // Initialize the FileObserver
+        fileObserver = new FileObserver(file.getAbsolutePath()) {
+            @Override
+            public void onEvent(int event, @Nullable String path) {
+                // If the file is modified, update the chart
+                if ((FileObserver.MODIFY & event) != 0) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            plotGraph();
+                        }
+                    });
+                }
+            }
+        };
 
         plotGraph();
     }
 
+void populateTableData() {
+    exerciseDataList.clear();
+    try {
+        Scanner scanner = new Scanner(file);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            String[] parts = line.split(",");
+            if (parts[0].equals(selectedExercise) && parts[5].equals("load_vel_profile")) {
+                float peakVelocity = Float.parseFloat(parts[2]);
+                float load = Float.parseFloat(parts[3]);
+                String percentageRM = parts[4];
+                exerciseDataList.add(new ExerciseData(peakVelocity, load, percentageRM));
+            }
+        }
+        scanner.close();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+
+
+
     @Override
     protected void onResume() {
         super.onResume();
-        plotGraph(); // Update the graph when the activity is resumed.
+        // Start the FileObserver
+        fileObserver.startWatching();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Stop the FileObserver
+        fileObserver.stopWatching();
+    }
+
+    public class DateMarkerView extends MarkerView {
+        private final TextView tvContent;
+
+        public DateMarkerView(Context context, int layoutResource) {
+            super(context, layoutResource);
+            tvContent = findViewById(R.id.tvContent);
+        }
+
+        @Override
+        public void refreshContent(Entry e, Highlight highlight) {
+            long unixTimestamp = (long) e.getX();
+            Date date = new Date(unixTimestamp);
+            DateFormat dateFormat = new SimpleDateFormat("d.MM", Locale.ENGLISH);
+            String dateString = dateFormat.format(date);
+            Log.d("DateMarkerView", "Data point pressed: " + dateString); // log the date corresponding to the data point
+            tvContent.setText(dateString);
+            super.refreshContent(e, highlight);
+        }
+
+
+        @Override
+        public MPPointF getOffset() {
+            return new MPPointF(-(getWidth() / 2), -getHeight());
+        }
+    }
+
+
+
 
     public void plotGraph() {
         readDataFromFile();
@@ -96,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Create a data object with the data sets
         LineData lineData = new LineData(dataSet);
+        chart.setDescription(null);
 
         // Set the data to the chart
         chart.setData(lineData);
@@ -106,8 +228,9 @@ public class MainActivity extends AppCompatActivity {
 
         YAxis yAxisLeft = chart.getAxisLeft();
         yAxisLeft.setDrawGridLines(false); // remove the grid lines
-        yAxisLeft.setAxisMinimum(minPeakVelocity - 0.2f); // start at minimum peak velocity - 0.2
-        yAxisLeft.setAxisMaximum(maxPeakVelocity + 0.2f); // end at maximum peak velocity + 0.2
+        yAxisLeft.setDrawLabels(false); // Hide labels on the Y-axis
+        yAxisLeft.setAxisMinimum(minPeakVelocity - 0.1f); // start at minimum peak velocity - 0.2
+        yAxisLeft.setAxisMaximum(maxPeakVelocity + 0.1f); // end at maximum peak velocity + 0.2
         yAxisLeft.setGranularity(1f); // interval 1
         yAxisLeft.setValueFormatter(new IndexAxisValueFormatter() {
             @Override
@@ -122,44 +245,24 @@ public class MainActivity extends AppCompatActivity {
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM); // set the XAxis to the bottom
         xAxis.setDrawGridLines(false); // remove the grid lines
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                return new SimpleDateFormat("d.MM", Locale.ENGLISH).format(new Date((long) value));
-            }
-        });
-
-        xAxis.setCenterAxisLabels(true); // align the date labels properly under the corresponding data points
-        xAxis.setLabelCount(6, true);
+        xAxis.setDrawLabels(false); // hide labels on the X-Axis
         xAxis.setTextColor(Color.BLACK);
         xAxis.setDrawAxisLine(true);
+        xAxis.setSpaceMin(0.1f); // add space before the first entry
 
-        Description description = new Description();
-        description.setText("Poteg na Roke (40kg)");
-        description.setTextColor(Color.BLACK);
-        description.setTextSize(12f);
 
-        // Calculate the width based on the chart's dimensions and offsets
-        float descriptionWidth = description.getText().length() * description.getTextSize();
-        float descriptionOffsetRight = chart.getViewPortHandler().offsetRight();
-        float chartWidth = chart.getViewPortHandler().contentWidth();
-        float descriptionPositionX = chartWidth - descriptionOffsetRight - descriptionWidth;
-        float descriptionPositionY = chart.getTop() + description.getTextSize() + 10f;
-        description.setPosition(descriptionPositionX, descriptionPositionY);
-
-        chart.setDescription(description);
 
         Legend legend = chart.getLegend();
         legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.RIGHT);
         legend.setVerticalAlignment(Legend.LegendVerticalAlignment.TOP);
         legend.setTextColor(Color.BLACK);
 
-        chart.invalidate(); // Refresh the chart
+        // Add MarkerView to show date when a data point is clicked
+        DateMarkerView markerView = new DateMarkerView(this, R.layout.marker_view);
+        chart.setMarker(markerView);
+
+        chart.invalidate();
     }
-
-
-
-
 
 
     private void readDataFromFile() {
@@ -169,11 +272,17 @@ public class MainActivity extends AppCompatActivity {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] parts = line.split(",");
-                if (parts[0].equals("Poteg na Roke") && parts[3].equals("40")) {
+                if (parts[0].equals("Poteg na Roke") && parts[3].equals("40") && parts[4].equals("daily_readiness")) {
                     float peakVelocity = Float.parseFloat(parts[2]);
-                    Date date = format.parse(parts[1].split("/")[0]);
+                    Date date = format.parse(parts[1]);
                     if (date != null) {
-                        entries.add(new Entry(date.getTime(), peakVelocity));
+                        Log.d("DateParsing", "Parsed date: " + date.toString());
+                        // Set hours, minutes, and seconds to 0 to standardize the time for all entries
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTime(date);
+
+
+                        entries.add(new Entry(calendar.getTimeInMillis(), peakVelocity));
                         minPeakVelocity = Math.min(minPeakVelocity, peakVelocity);
                         maxPeakVelocity = Math.max(maxPeakVelocity, peakVelocity); // update maximum peak velocity
                     }
@@ -184,6 +293,112 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    public class ExerciseData {
+        private float peakVelocity;
+        private float load;
+        private String percentageRM;
+
+        public ExerciseData(float peakVelocity, float load, String percentageRM) {
+            this.peakVelocity = peakVelocity;
+            this.load = load;
+            this.percentageRM = percentageRM;
+        }
+
+        public float getPeakVelocity() {
+            return peakVelocity;
+        }
+
+        public float getLoad() {
+            return load;
+        }
+
+        public String getPercentageRM() {
+            return percentageRM;
+        }
+    }
+
+    public class ExerciseDataAdapter extends RecyclerView.Adapter<ExerciseDataAdapter.ViewHolder> {
+        private List<ExerciseData> exerciseDataList;
+        private static final int HEADER_VIEW_TYPE = 0;
+        private static final int ITEM_VIEW_TYPE = 1;
+
+
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            private final TextView peakVelocityView;
+            private final TextView loadView;
+            private final TextView percentageRMView;
+
+            public ViewHolder(View view) {
+                super(view);
+                peakVelocityView = view.findViewById(R.id.peak_velocity);
+                loadView = view.findViewById(R.id.load);
+                percentageRMView = view.findViewById(R.id.percentage_rm);
+            }
+        }
+
+        public class HeaderViewHolder extends ViewHolder {
+            public HeaderViewHolder(View view) {
+                super(view);
+            }
+        }
+
+        public ExerciseDataAdapter(List<ExerciseData> dataSet) {
+            this.exerciseDataList = dataSet;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            if (viewType == HEADER_VIEW_TYPE) {
+                View headerView = LayoutInflater.from(parent.getContext()).inflate(R.layout.table_header_item, parent, false);
+                return new HeaderViewHolder(headerView);
+            } else {
+                View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.table_row_item, parent, false);
+                return new ViewHolder(itemView);
+            }
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+            if (getItemViewType(position) == HEADER_VIEW_TYPE) {
+                // Bind header data
+                viewHolder.peakVelocityView.setText("Vmax [m/s]");
+                viewHolder.loadView.setText("Load [kg]");
+                viewHolder.percentageRMView.setText("%RM");
+            } else {
+                // Bind exercise data
+                ExerciseData exerciseData = exerciseDataList.get(position - 1);
+                viewHolder.peakVelocityView.setText(String.valueOf(exerciseData.getPeakVelocity()));
+                viewHolder.loadView.setText(String.valueOf(exerciseData.getLoad()));
+
+                // Modify the percentageRM value to remove "RM" from it
+                String percentageRM = exerciseData.getPercentageRM();
+                percentageRM = percentageRM.replace("RM", "");  // remove "RM" from the string
+                viewHolder.percentageRMView.setText(percentageRM);
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            // Add 1 to account for the header row
+            return exerciseDataList.size() + 1;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (position == 0) {
+                return HEADER_VIEW_TYPE;
+            } else {
+                return ITEM_VIEW_TYPE;
+            }
+        }
+    }
+
+
+
+
+
 
     public void startActivityWorkout(View view) {
         Intent intent = new Intent(MainActivity.this, WorkoutActivity.class);

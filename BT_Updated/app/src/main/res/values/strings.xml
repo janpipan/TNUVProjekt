@@ -5,4 +5,13 @@
     <string name="settings">SETTINGS</string>
     <string name="search_button">Search Paired Devices</string>
     <string name="app_settings">SETTINGS</string>
+
+    <string-array name="exercises_array">
+        <item>Poteg</item>
+        <item>Poteg na Moč</item>
+        <item>Poteg na Roke</item>
+        <item>Nalog</item>
+        <item>Nalog na Moč</item>
+        <item>Nalog na Roke</item>
+    </string-array>
 </resources>

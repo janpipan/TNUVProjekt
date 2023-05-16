@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:paddingBottom="16dp"
+    android:background="@drawable/header_border">
+
+    <TextView
+        android:id="@+id/peak_velocity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Vmax [m/s]"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/load"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Load [kg]"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/percentage_rm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="%RM"
+        android:textStyle="bold" />
+
+</LinearLayout>
