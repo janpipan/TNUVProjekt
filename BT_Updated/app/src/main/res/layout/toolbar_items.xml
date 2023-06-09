@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:background="#7B7B7B"> <!-- Change this to your desired dark grey color -->
 
     <Button
         android:id="@+id/nav_workout"
@@ -12,7 +12,8 @@
         android:layout_weight="1"
         android:text="@string/workout"
         android:onClick="startActivityWorkout"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent"
+        android:textColor="@android:color/white"/> <!-- Added text color to buttons -->
 
     <Button
         android:id="@+id/nav_analysis"
@@ -21,7 +22,8 @@
         android:layout_weight="1"
         android:text="@string/analysis"
         android:onClick="startActivityAnalysis"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent"
+        android:textColor="@android:color/white"/> <!-- Added text color to buttons -->
 
     <Button
         android:id="@+id/nav_settings"
@@ -30,6 +32,7 @@
         android:layout_weight="1"
         android:text="@string/settings"
         android:onClick="startActivitySettings"
-        android:background="@android:color/transparent"/>
+        android:background="@android:color/transparent"
+        android:textColor="@android:color/white"/> <!-- Added text color to buttons -->
 
 </LinearLayout>

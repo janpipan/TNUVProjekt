@@ -24,6 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -211,10 +212,11 @@ public class MainActivity extends AppCompatActivity {
         LineDataSet dataSet = new LineDataSet(entries, "Poteg na Roke (40kg)");
 
         // Configure the data set
-        dataSet.setColor(Color.RED);
+        int lighterBlue = ContextCompat.getColor(this, R.color.lighter_blue);
+        dataSet.setColor(lighterBlue);
         dataSet.setValueTextColor(Color.BLACK);
-        dataSet.setCircleColor(Color.RED);
-        dataSet.setCircleHoleColor(Color.RED);
+        dataSet.setCircleColor(lighterBlue);
+        dataSet.setCircleHoleColor(lighterBlue);
         dataSet.setValueFormatter(new ValueFormatter() {
             @Override
             public String getPointLabel(Entry entry) {

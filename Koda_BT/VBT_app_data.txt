@@ -1,3 +1,19 @@
 Poteg na Roke,3.05.2023/14:03:49,2.69,60
 Poteg na Roke,3.05.2023/14:04:09,2.96,70
 Nalog,3.05.2023/14:05:01,3.1,90
+Poteg na Roke,3.05.2023/14:04:09,2.96,70
+Poteg na Roke,3.05.2023/14:04:09,2.96,40
+Poteg na Roke,4.05.2023/14:04:09,3.1,40
+Poteg na Roke,5.05.2023/14:04:09,2.85,40
+Poteg na Roke,6.05.2023/14:04:09,3.25,40
+Poteg na Roke,7.05.2023/14:04:09,3.12,40
+Poteg na Roke,8.05.2023/14:04:09,2.99,40
+Poteg na Roke,9.05.2023/14:04:09,3.05,40
+Poteg na Roke,10.05.2023/14:04:09,2.91,40
+Poteg na Roke,11.05.2023/14:04:09,2.85,40
+Poteg na Roke,12.05.2023/14:04:09,2.85,40
+Poteg na Roke,13.05.2023/14:04:09,3.12,40
+Poteg na Roke,14.05.2023/14:04:09,2.99,40
+Poteg na Roke,15.05.2023/14:04:09,3.15,40,daily_readiness
+Poteg na Roke,16.05.2023/14:01:09,2.98,40,daily_readiness
+Poteg na Roke,17.05.2023/14:04:09,3.12,40,daily_readiness
