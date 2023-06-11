@@ -14,4 +14,8 @@
         <item>Nalog na Moč</item>
         <item>Nalog na Roke</item>
     </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="new_workout">NEW WORKOUT</string>
+    <string name="bluetooth_status">NOT CONNECTED</string>
 </resources>

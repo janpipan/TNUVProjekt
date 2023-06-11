@@ -1,57 +1,38 @@
 package si.uni_lj.fe.tnuv.bt_simple;
 
-import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.FileObserver;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import androidx.activity.result.ActivityResultCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.MarkerView;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.Highlight;
 import com.github.mikephil.charting.utils.EntryXComparator;
-
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.utils.MPPointF;
 
 import java.io.File;
@@ -60,217 +41,109 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
-import java.util.Set;
-import java.util.Calendar;
-
-public class MainActivity extends AppCompatActivity {
 
 
-    ActivityResultLauncher<String[]> mPermissionResultLauncher;
-    private boolean isFilesAndMediaPermissionGranted = false;
-    private boolean isLocationPermissionGranted = false;
-    private boolean isBluetoothPermissionGranted = false;
-    private boolean isBluetoothConnectPermissionGranted = false;
+public class Analysis extends Fragment {
 
-    private List<String> deniedPermissionList = new ArrayList<String>();
+    private LineChart chart;
+    private List<Entry> entries = new ArrayList<>();
+    private File file;
+    private DateFormat format = new SimpleDateFormat("d.MM.yyyy/HH:mm:ss", Locale.getDefault());
+
+    private float minPeakVelocity = Float.MAX_VALUE;
+    private float maxPeakVelocity = Float.MIN_VALUE;
+    private FileObserver fileObserver;
+    private List<ExerciseData> exerciseDataList = new ArrayList<>();
+    private ExerciseDataAdapter exerciseDataAdapter;
+    private String selectedExercise;  // Declare as a class-level variable
+
+
+    public Analysis() {
+        // Required empty public constructor
+    }
+
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        mPermissionResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
-            @Override
-            public void onActivityResult(Map<String, Boolean> result) {
-                if (result.get(Manifest.permission.BLUETOOTH_SCAN) != null){
-                    isBluetoothPermissionGranted = result.get(Manifest.permission.BLUETOOTH_SCAN);
-                    if (!isBluetoothPermissionGranted) {
-                        deniedPermissionList.add("Bluetooth Scan");
-                    }
-                }
-                if (result.get(Manifest.permission.BLUETOOTH_CONNECT) != null) {
-                    isBluetoothConnectPermissionGranted = result.get(Manifest.permission.BLUETOOTH_CONNECT);
-                    if (!isBluetoothConnectPermissionGranted) {
-                        deniedPermissionList.add("Bluetooth Connect");
-                    }
-                }
-                if (result.get(Manifest.permission.READ_EXTERNAL_STORAGE) != null){
-                    isFilesAndMediaPermissionGranted = result.get(Manifest.permission.READ_EXTERNAL_STORAGE);
-                    if (!isFilesAndMediaPermissionGranted) {
-                        deniedPermissionList.add("Read External Storage");
-                    }
-                }
-                if (result.get(Manifest.permission.ACCESS_FINE_LOCATION) != null){
-                    isLocationPermissionGranted = result.get(Manifest.permission.ACCESS_FINE_LOCATION);
-                    if (!isLocationPermissionGranted) {
-                        deniedPermissionList.add("Access Fine Location");
-                    }
-                }
-
-                if (!deniedPermissionList.isEmpty()) {
-                    showRationaleDialog(deniedPermissionList);
-                }
-
-            }
-        });
-
-        requestPermission();
-
-
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        // button for switching to workout fragment
-        Button btnworkout = findViewById(R.id.nav_workout);
-        btnworkout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerView, Workout.class, null)
-                        .setReorderingAllowed(true)
-                        .addToBackStack("name") // Name can be null
-                        .commit();
-
-            }
-        });
-
-        // button for switching to analysis fragment
-        Button btnanalysis = findViewById(R.id.nav_analysis);
-        btnanalysis.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerView, Analysis.class, null)
-                        .setReorderingAllowed(true)
-                        .addToBackStack("name") // Name can be null
-                        .commit();
-
-            }
-        });
-
-        // button for switching to workout fragment
-        Button btnsettings = findViewById(R.id.nav_settings);
-        btnsettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerView, Settings.class, null)
-                        .setReorderingAllowed(true)
-                        .addToBackStack("name") // Name can be null
-                        .commit();
-
-            }
-        });
 
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_analysis, container, false);
+    }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        requestPermission();
+        // Start the FileObserver
+        fileObserver.startWatching();
     }
-
-
-    private void requestPermission(){
-
-        List<String> permissionRequest = new ArrayList<String>();
-        List<String> permissionRationaleList = new ArrayList<String>();
-
-        isFilesAndMediaPermissionGranted = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-        ) == PackageManager.PERMISSION_GRANTED;
-
-        isLocationPermissionGranted = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED;
-
-        isBluetoothPermissionGranted = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_SCAN
-        ) == PackageManager.PERMISSION_GRANTED;
-
-        isBluetoothConnectPermissionGranted = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT
-        ) == PackageManager.PERMISSION_GRANTED;
-
-
-
-        if (!isBluetoothPermissionGranted){
-            permissionRequest.add(Manifest.permission.BLUETOOTH_SCAN);
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_SCAN)) {
-                permissionRationaleList.add("Bluetooth Scan");
-            }
-        }
-        if (!isBluetoothConnectPermissionGranted){
-            permissionRequest.add(Manifest.permission.BLUETOOTH_CONNECT);
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.BLUETOOTH_CONNECT)) {
-                permissionRationaleList.add("Bluetooth Connect");
-            }
-        }
-        if (!isFilesAndMediaPermissionGranted){
-            permissionRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                permissionRationaleList.add("Read External Storage");
-            }
-        }
-        if (!isLocationPermissionGranted){
-            permissionRequest.add(Manifest.permission.ACCESS_FINE_LOCATION);
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-                permissionRationaleList.add("Access Fine Location");
-            }
-        }
-
-
-        if(!permissionRequest.isEmpty()){
-            if(!permissionRationaleList.isEmpty()){
-                showRationaleDialog(permissionRationaleList);
-            }
-            else{
-                mPermissionResultLauncher.launch(permissionRequest.toArray(new String[0]));
-            }
-        }
-    }
-    private void showRationaleDialog(List<String> permissionList) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Permissions Required")
-                .setMessage("You have declined the " + permissionList.toString() + " permissions. Please allow them for the app to function properly.")
-                .setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Send the user to the settings page and bring them back to your app after they're done
-                        Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package", getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // You can handle negative button click here
-                        finish();
-                    }
-                });
-        builder.create().show();
-    }
-
-
-
-    /*
-
-
 
     @Override
-    protected void onPause() {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        chart = view.findViewById(R.id.chart);
+        chart.setBackgroundColor(Color.WHITE);  // set chart's background color to white
+        chart.setExtraOffsets(0f, 10f, 0f, 10f);  // modify the offset values here
+        file = new File(getContext().getExternalFilesDir(null), "bluetoothData.txt");
+
+        // Initialize RecyclerView and its adapter
+        RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
+        exerciseDataAdapter = new ExerciseDataAdapter(exerciseDataList);
+        recyclerView.setAdapter(exerciseDataAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        Spinner spinner = view.findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.exercises_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedExercise = parent.getItemAtPosition(position).toString();
+                // When an exercise is selected, re-populate the table data and notify the adapter
+                populateTableData();
+                exerciseDataAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Another interface callback
+            }
+        });
+
+        // Initialize the FileObserver
+        fileObserver = new FileObserver(file.getAbsolutePath()) {
+            @Override
+            public void onEvent(int event, @Nullable String path) {
+                // If the file is modified, update the chart
+                if ((FileObserver.MODIFY & event) != 0) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            plotGraph();
+                        }
+                    });
+                }
+            }
+        };
+
+        plotGraph();
+    }
+    @Override
+    public void onPause() {
         super.onPause();
         // Stop the FileObserver
         fileObserver.stopWatching();
@@ -315,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
         LineDataSet dataSet = new LineDataSet(entries, "Poteg na Roke (40kg)");
 
         // Configure the data set
-        int lighterBlue = ContextCompat.getColor(this, R.color.lighter_blue);
+        int lighterBlue = ContextCompat.getColor(getContext(), R.color.lighter_blue);
         dataSet.setColor(lighterBlue);
         dataSet.setValueTextColor(Color.BLACK);
         dataSet.setCircleColor(lighterBlue);
@@ -370,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         legend.setTextColor(Color.BLACK);
 
         // Add MarkerView to show date when a data point is clicked
-        DateMarkerView markerView = new DateMarkerView(this, R.layout.marker_view);
+        DateMarkerView markerView = new DateMarkerView(getContext(), R.layout.marker_view);
         chart.setMarker(markerView);
 
         chart.invalidate();
@@ -384,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 String[] parts = line.split(",");
+
                 if (parts[0].equals("Poteg na Roke") && parts[3].equals("40") && parts[4].equals("daily_readiness")) {
                     float peakVelocity = Float.parseFloat(parts[2]);
                     Date date = format.parse(parts[1]);
@@ -507,7 +381,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    */
-
-
+    void populateTableData() {
+        exerciseDataList.clear();
+        try {
+            Scanner scanner = new Scanner(file);
+            while (scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                String[] parts = line.split(",");
+                if (parts[0].equals(selectedExercise)) {
+                    String lastWord = parts[parts.length - 1];
+                    if (selectedExercise.equals("Poteg na Roke") && lastWord.equals("daily_readiness")) {
+                        continue; // Skip entries with "daily_readiness" for "Poteg na Roke"
+                    }
+                    if (lastWord.equals("load_vel_profile")) {
+                        float peakVelocity = Float.parseFloat(parts[2]);
+                        float load = Float.parseFloat(parts[3]);
+                        String percentageRM = parts[4];
+                        exerciseDataList.add(new ExerciseData(peakVelocity, load, percentageRM));
+                    }
+                }
+            }
+            scanner.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -27,123 +27,17 @@
 
         </androidx.appcompat.widget.Toolbar>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            />
-
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:paddingBottom="10dp"
-            android:background="@drawable/rounded_background"
-            >
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="DAILY READINESS"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="10dp"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <FrameLayout
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragmentContainerView"
+                android:name="si.uni_lj.fe.tnuv.bt_simple.Analysis"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/chart_border"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:padding="2dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="start|center_vertical"
-                    android:orientation="vertical"
-                    android:paddingLeft="-10dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:rotation="-90"
-                        android:text="Vmax"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <com.github.mikephil.charting.charts.LineChart
-                    android:id="@+id/chart"
-                    android:layout_width="match_parent"
-                    android:layout_height="250dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Days"
-                    android:layout_gravity="bottom|center_horizontal"
-                    android:textSize="12sp"/>
-
-            </FrameLayout>
+                android:layout_height="match_parent" />
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            />
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:orientation="vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/rounded_background">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="LOAD VELOCITY PROFILE"
-                android:layout_marginTop="10dp"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <FrameLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/rectangle_border"
-                android:layout_marginTop="10dp"
-                android:layout_marginStart="10dp">
-
-                <Spinner
-                    android:id="@+id/spinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="10dp"
-                     />
-            </FrameLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="16dp"
-                android:padding="8dp"
-                android:layout_marginStart="0dp"/>
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="10dp"
-            />
     </LinearLayout>
 </ScrollView>

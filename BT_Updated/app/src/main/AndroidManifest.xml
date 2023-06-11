@@ -20,12 +20,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BT_simple">
         <activity
-            android:name=".WorkoutActivity"
-            android:exported="false" />
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
