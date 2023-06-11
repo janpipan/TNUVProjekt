@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:background="#7B7B7B"> <!-- Change this to your desired dark grey color -->
+    android:background="#7B7B7B">
 
     <Button
         android:id="@+id/nav_workout"
@@ -11,9 +11,9 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/workout"
-        android:onClick="startActivityWorkout"
         android:background="@android:color/transparent"
-        android:textColor="@android:color/white"/> <!-- Added text color to buttons -->
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
 
     <Button
         android:id="@+id/nav_analysis"
@@ -21,9 +21,9 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/analysis"
-        android:onClick="startActivityAnalysis"
         android:background="@android:color/transparent"
-        android:textColor="@android:color/white"/> <!-- Added text color to buttons -->
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
 
     <Button
         android:id="@+id/nav_settings"
@@ -31,8 +31,8 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="@string/settings"
-        android:onClick="startActivitySettings"
         android:background="@android:color/transparent"
-        android:textColor="@android:color/white"/> <!-- Added text color to buttons -->
+        android:textColor="@android:color/white"
+        android:textSize="18sp"/>
 
 </LinearLayout>
