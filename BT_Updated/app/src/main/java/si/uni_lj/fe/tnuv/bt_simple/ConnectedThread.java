@@ -13,13 +13,15 @@ import java.io.OutputStream;
 
 public class ConnectedThread extends Thread {
     private final BluetoothSocket socket;
+    private final BluetoothData viewModel;
     private final InputStream inputStream;
     private final OutputStream outputStream;
     private final ConnectionStatusListener connectionStatusListener;
 
-    public ConnectedThread(BluetoothSocket socket, ConnectionStatusListener listener) {
+    public ConnectedThread(BluetoothSocket socket, ConnectionStatusListener listener, BluetoothData viewModel) {
         this.socket = socket;
         this.connectionStatusListener = listener;
+        this.viewModel = viewModel;
         InputStream tmpIn = null;
         OutputStream tmpOut = null;
 
@@ -46,8 +48,9 @@ public class ConnectedThread extends Thread {
                 if (bytes > 0) {
                     String newContent = new String(buffer, 0, bytes, "UTF-8");
                     Log.d("ConnectedThread", "Received new content: " + newContent);
-                    writeToFile("bluetoothData.txt", newContent);
-                    connectionStatusListener.onNewReceivedData(newContent);
+                    viewModel.setReceivedData(newContent);
+                    //writeToFile("bluetoothData.txt", newContent);
+                    //connectionStatusListener.onNewReceivedData(newContent);
                 }
             } catch (IOException e) {
                 Log.d("ConnectedThread", "Error occurred when reading input stream", e);

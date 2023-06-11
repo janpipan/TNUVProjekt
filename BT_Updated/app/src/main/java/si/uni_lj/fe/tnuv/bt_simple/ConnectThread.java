@@ -14,12 +14,14 @@ import java.util.UUID;
 public class ConnectThread extends Thread {
     private final BluetoothDevice device;
     private final BluetoothSocket socket;
+    private final BluetoothData viewModel;
     private final ConnectionStatusListener connectionStatusListener;
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    public ConnectThread(BluetoothDevice device, ConnectionStatusListener listener) {
+    public ConnectThread(BluetoothDevice device, ConnectionStatusListener listener, BluetoothData viewModel) {
         this.device = device;
         this.connectionStatusListener = listener;
+        this.viewModel = viewModel;
         BluetoothSocket tmpSocket = null;
 
         try {
@@ -48,7 +50,10 @@ public class ConnectThread extends Thread {
             }
             socket.connect();
             connectionStatusListener.onConnectionSuccess();
-            ConnectedThread connectedThread = new ConnectedThread(socket, connectionStatusListener);
+
+            viewModel.setBluetoothSocket(socket);
+
+            ConnectedThread connectedThread = new ConnectedThread(socket, connectionStatusListener, viewModel);
             connectedThread.start();
         } catch (IOException connectException) {
             try {

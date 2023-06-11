@@ -7,12 +7,10 @@
     android:background="?attr/colorBackground">
 
     <LinearLayout
-        android:id="@+id/workouts_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:orientation="vertical">
-
 
         <Button
             android:id="@+id/new_workout"
@@ -25,13 +23,27 @@
 
     </LinearLayout>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/workouts_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"/>
+
+    </ScrollView>
+
     <LinearLayout
+        android:id="@+id/bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:orientation="horizontal"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:background="@color/lighter_blue"
         android:gravity="center"
-        android:background="@color/lighter_blue">
+        android:orientation="horizontal">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -44,20 +56,23 @@
             android:layout_weight="1"
             android:text="@string/bluetooth_status"
             android:textColor="@color/white"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
         <Button
             android:id="@+id/finish_workout"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="FINISH WORKOUT"
             android:background="#0000"
             android:gravity="center"
+            android:text="FINISH WORKOUT"
             android:textColor="@color/white"
-            android:textSize="16sp"/>
+            android:textSize="16sp" />
 
 
     </LinearLayout>
+
+
+
 
 </RelativeLayout>
