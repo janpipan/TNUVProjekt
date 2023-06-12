@@ -67,15 +67,17 @@
 
 
 
-                <TextView
+                <EditText
                     android:id="@+id/comment"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Comment"
+                    android:layout_height="match_parent"
+                    android:hint="Comment"
                     android:paddingStart="5dp"
                     android:layout_margin="2dp"
                     android:background="?attr/colorBackground"
                     android:textSize="20sp"/>
+
+
 
                 <TextView
                     android:id="@+id/peak_velocity"
@@ -90,7 +92,7 @@
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:padding="5sp">
@@ -104,16 +106,20 @@
                     android:layout_margin="2dp"
                     android:background="?attr/colorBackground"
                     android:textSize="20sp"/>
+                <!--
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:gravity="center">
 
-                <TextView
-                    android:id="@+id/picture"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Tag"
-                    android:paddingStart="5dp"
-                    android:layout_margin="2dp"
-                    android:background="?attr/colorBackground"
-                    android:textSize="20sp"/>
+                                    <View
+                                        android:layout_width="75dp"
+                                        android:layout_height="75dp"
+                                        android:background="@drawable/circle"/>
+
+                                </LinearLayout>
+                -->
 
             </LinearLayout>
 

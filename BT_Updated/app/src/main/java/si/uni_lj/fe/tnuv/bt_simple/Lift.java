@@ -1,5 +1,7 @@
 package si.uni_lj.fe.tnuv.bt_simple;
 
+import android.util.Log;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,6 +14,7 @@ public class Lift {
     private int weight;
     private String percentage;
     private String tag;
+    private String comment;
 
     public Lift(String rawData) {
         String[] dataParts = rawData.split(",");
@@ -58,6 +61,8 @@ public class Lift {
         return tag;
     }
 
+    public String getComment(){return comment;}
+
     public void setExercise(String exercise){
         this.exercise = exercise;
     }
@@ -80,5 +85,14 @@ public class Lift {
 
     public void setTag(String tag){
         this.tag = tag;
+    }
+
+    public void setComment(String comment) {this.comment = comment;}
+
+    public String toString(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy/HH:mm:ss", Locale.getDefault());
+        String[] liftArray = {this.exercise, dateFormat.format(this.date), Double.toString(this.peakVelocity), Integer.toString(this.weight), this.percentage, this.tag, this.comment};
+        Log.d("liftString", String.join(",",liftArray));
+        return String.join(",",liftArray);
     }
 }

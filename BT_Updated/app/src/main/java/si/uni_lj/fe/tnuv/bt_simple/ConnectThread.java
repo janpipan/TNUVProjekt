@@ -52,6 +52,7 @@ public class ConnectThread extends Thread {
             connectionStatusListener.onConnectionSuccess();
 
             viewModel.setBluetoothSocket(socket);
+            viewModel.startConnection();
 
             ConnectedThread connectedThread = new ConnectedThread(socket, connectionStatusListener, viewModel);
             connectedThread.start();
@@ -62,6 +63,7 @@ public class ConnectThread extends Thread {
                 closeException.printStackTrace();
             }
             connectionStatusListener.onConnectionFailed();
+            viewModel.stopConnection();
         }
     }
 

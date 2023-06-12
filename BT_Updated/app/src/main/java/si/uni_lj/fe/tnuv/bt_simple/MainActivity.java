@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         workoutViewModel = new ViewModelProvider(this).get(WorkoutViewModel.class);
 
+
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         // button for switching to workout fragment

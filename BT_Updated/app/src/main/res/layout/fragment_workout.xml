@@ -45,12 +45,16 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <ImageView
+        <LinearLayout
+            android:id="@+id/bluetooth_icon"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/baseline_bluetooth_searching_24" />
+            android:layout_height="wrap_content">
+
+        </LinearLayout>
+
 
         <TextView
+            android:id="@+id/bluetooth_connection"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

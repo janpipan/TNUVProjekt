@@ -51,6 +51,8 @@ public class Settings extends Fragment implements ConnectionStatusListener{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        MainActivity mainActivity = (MainActivity) requireActivity();
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         ListView devicesListView = view.findViewById(R.id.devices_list_view);
         viewModel = new ViewModelProvider(requireActivity()).get(BluetoothData.class);

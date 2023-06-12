@@ -98,6 +98,7 @@ public class Analysis extends Fragment {
         chart.setExtraOffsets(0f, 10f, 0f, 10f);  // modify the offset values here
         file = new File(getContext().getExternalFilesDir(null), "bluetoothData.txt");
 
+
         // Initialize RecyclerView and its adapter
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         exerciseDataAdapter = new ExerciseDataAdapter(exerciseDataList);
@@ -258,7 +259,7 @@ public class Analysis extends Fragment {
                 String line = scanner.nextLine();
                 String[] parts = line.split(",");
 
-                if (parts[0].equals("Poteg na Roke") && parts[3].equals("40") && parts[4].equals("daily_readiness")) {
+                if (parts[0].equals("Poteg na Roke") && parts[3].equals("40") && parts[5].equals("daily_readiness")) {
                     float peakVelocity = Float.parseFloat(parts[2]);
                     Date date = format.parse(parts[1]);
                     if (date != null) {
@@ -389,11 +390,11 @@ public class Analysis extends Fragment {
                 String line = scanner.nextLine();
                 String[] parts = line.split(",");
                 if (parts[0].equals(selectedExercise)) {
-                    String lastWord = parts[parts.length - 1];
-                    if (selectedExercise.equals("Poteg na Roke") && lastWord.equals("daily_readiness")) {
+                    String tag = parts[5];
+                    if (selectedExercise.equals("Poteg na Roke") && tag.equals("daily_readiness")) {
                         continue; // Skip entries with "daily_readiness" for "Poteg na Roke"
                     }
-                    if (lastWord.equals("load_vel_profile")) {
+                    if (tag.equals("load_vel_profile")) {
                         float peakVelocity = Float.parseFloat(parts[2]);
                         float load = Float.parseFloat(parts[3]);
                         String percentageRM = parts[4];
