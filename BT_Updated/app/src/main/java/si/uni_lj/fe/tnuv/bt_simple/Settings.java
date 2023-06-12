@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +27,7 @@ public class Settings extends Fragment implements ConnectionStatusListener{
 
     
     private BluetoothAdapter bluetoothAdapter;
-
+    private BluetoothData viewModel;
     private ArrayAdapter<String> deviceListAdapter;
 
     public Settings() {
@@ -50,8 +51,11 @@ public class Settings extends Fragment implements ConnectionStatusListener{
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        MainActivity mainActivity = (MainActivity) requireActivity();
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         ListView devicesListView = view.findViewById(R.id.devices_list_view);
+        viewModel = new ViewModelProvider(requireActivity()).get(BluetoothData.class);
         deviceListAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1);
         devicesListView.setAdapter(deviceListAdapter);
 
@@ -61,7 +65,7 @@ public class Settings extends Fragment implements ConnectionStatusListener{
                 String deviceInfo = deviceListAdapter.getItem(position);
                 String address = deviceInfo.split(" - ")[1];
                 BluetoothDevice device = bluetoothAdapter.getRemoteDevice(address);
-                ConnectThread connectThread = new ConnectThread(device, Settings.this);
+                ConnectThread connectThread = new ConnectThread(device, Settings.this, viewModel);
                 connectThread.start();
             }
         });

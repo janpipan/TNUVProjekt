@@ -1,79 +1,35 @@
 package si.uni_lj.fe.tnuv.bt_simple;
 
 import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.Context;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
+
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.FileObserver;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.lifecycle.ViewModelProvider;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.MarkerView;
-import com.github.mikephil.charting.data.Entry;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.formatter.ValueFormatter;
-import com.github.mikephil.charting.highlight.Highlight;
-import com.github.mikephil.charting.utils.EntryXComparator;
-
-import com.github.mikephil.charting.components.Description;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.formatter.IAxisValueFormatter;
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.utils.MPPointF;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
-import java.util.Set;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
 
     ActivityResultLauncher<String[]> mPermissionResultLauncher;
+    public WorkoutViewModel workoutViewModel;
     private boolean isFilesAndMediaPermissionGranted = false;
     private boolean isLocationPermissionGranted = false;
     private boolean isBluetoothPermissionGranted = false;
@@ -124,12 +80,14 @@ public class MainActivity extends AppCompatActivity {
 
         requestPermission();
 
+        workoutViewModel = new ViewModelProvider(this).get(WorkoutViewModel.class);
+
 
         FragmentManager fragmentManager = getSupportFragmentManager();
 
         // button for switching to workout fragment
-        Button btnworkout = findViewById(R.id.nav_workout);
-        btnworkout.setOnClickListener(new View.OnClickListener() {
+        Button btnWorkout = findViewById(R.id.nav_workout);
+        btnWorkout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fragmentManager.beginTransaction()
@@ -142,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // button for switching to analysis fragment
-        Button btnanalysis = findViewById(R.id.nav_analysis);
-        btnanalysis.setOnClickListener(new View.OnClickListener() {
+        Button btnAnalysis = findViewById(R.id.nav_analysis);
+        btnAnalysis.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fragmentManager.beginTransaction()
@@ -156,8 +114,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // button for switching to workout fragment
-        Button btnsettings = findViewById(R.id.nav_settings);
-        btnsettings.setOnClickListener(new View.OnClickListener() {
+        Button btnSettings = findViewById(R.id.nav_settings);
+        btnSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 fragmentManager.beginTransaction()
