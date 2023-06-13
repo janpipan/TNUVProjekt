@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -81,6 +82,9 @@ public class MainActivity extends AppCompatActivity {
         requestPermission();
 
         workoutViewModel = new ViewModelProvider(this).get(WorkoutViewModel.class);
+        workoutViewModel.initializeData();
+        workoutViewModel.readDataFromFile(this, "bluetoothData.txt");
+        //Log.d("workoutViewModel", Double.toString(workoutViewModel.vmaxData().getValue().get("Poteg na Roke").get("80%RM")));
 
 
         FragmentManager fragmentManager = getSupportFragmentManager();

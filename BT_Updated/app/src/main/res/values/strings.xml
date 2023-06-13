@@ -8,10 +8,10 @@
 
     <string-array name="exercises_array">
         <item>Poteg</item>
-        <item>Poteg na Moč</item>
+        <item>Poteg na Moc</item>
         <item>Poteg na Roke</item>
         <item>Nalog</item>
-        <item>Nalog na Moč</item>
+        <item>Nalog na Moc</item>
         <item>Nalog na Roke</item>
     </string-array>
     <!-- TODO: Remove or change this placeholder text -->

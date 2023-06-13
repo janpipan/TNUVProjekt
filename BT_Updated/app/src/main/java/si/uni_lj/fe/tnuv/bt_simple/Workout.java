@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,7 +88,12 @@ public class Workout extends Fragment {
                 // if workout list is not empty display lifts on screen
                 if (workoutSession.getLifts().size() > 0){
                     for (Lift lift: workoutSession.getLifts()){
-                        addLiftView(view, lift);
+                        if (lift.getPercentToMax() > 0){
+                            addLiftView(view, lift, lift.getPercentToMax());
+                        } else {
+                            addLiftView(view, lift, 0);
+                        }
+
                     }
                 }
             }
@@ -119,7 +125,18 @@ public class Workout extends Fragment {
                         if (s != null && !s.isEmpty()){
                             Lift lift = new Lift(s);
                             workoutSession.addLift(lift);
-                            addLiftView(view, lift);
+                            String exercise = lift.getExercise();
+                            String percentage = lift.getPercentage();
+                            Double peakVelocity = lift.getPeakVelocity();
+                            Double vmax = mainActivity.workoutViewModel.vmaxData().getValue().get(exercise).get(percentage);
+                            if (lift.getTag().equals("workout_lift")){
+                                int percentToMax = (int) ((peakVelocity / vmax ) * 100);
+                                lift.setPercentToMax(percentToMax);
+                                addLiftView(view, lift, percentToMax);
+                            } else {
+                                addLiftView(view, lift, 0);
+                            }
+
                             Toast.makeText(requireContext(), s, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -136,6 +153,7 @@ public class Workout extends Fragment {
                     // write workout to file
                     File appSpecificExternalDir = getContext().getExternalFilesDir(null);
                     workoutSession.writeToFile("bluetoothData.txt", appSpecificExternalDir.getAbsolutePath());
+                    mainActivity.workoutViewModel.readDataFromFile(getContext(),"bluetoothData.txt");
 
                     // delete lift view
                     LinearLayout parentLayout = view.findViewById(R.id.workouts_layout);
@@ -154,7 +172,7 @@ public class Workout extends Fragment {
         });
     }
 
-    private void addLiftView(View view, Lift lift){
+    private void addLiftView(View view, Lift lift, int percentToMax){
         LinearLayout parentLayout = view.findViewById(R.id.workouts_layout);
         // inflate a layout from xml
         LayoutInflater inflater = LayoutInflater.from(requireContext());
@@ -172,6 +190,11 @@ public class Workout extends Fragment {
         ((TextView) newWorkout.findViewById(R.id.peak_velocity)).setText("Peak velocity" + String.valueOf(lift.getPeakVelocity()));
         ((TextView) newWorkout.findViewById(R.id.tag)).setText(lift.getTag());
         ((EditText) newWorkout.findViewById(R.id.comment)).setText(lift.getComment());
+
+        if (percentToMax > 0){
+            ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setText(String.valueOf(percentToMax));
+        }
+
 
         // add view to parent layout
 

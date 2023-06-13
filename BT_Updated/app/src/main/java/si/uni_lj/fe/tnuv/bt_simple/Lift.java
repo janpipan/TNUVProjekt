@@ -12,9 +12,11 @@ public class Lift {
     private Date date;
     private double peakVelocity;
     private int weight;
+    private int percentToMax;
     private String percentage;
     private String tag;
     private String comment;
+
 
     public Lift(String rawData) {
         String[] dataParts = rawData.split(",");
@@ -63,6 +65,8 @@ public class Lift {
 
     public String getComment(){return comment;}
 
+    public int getPercentToMax() {return percentToMax;}
+
     public void setExercise(String exercise){
         this.exercise = exercise;
     }
@@ -88,6 +92,7 @@ public class Lift {
     }
 
     public void setComment(String comment) {this.comment = comment;}
+    public void setPercentToMax(int percentToMax) {this.percentToMax = percentToMax;}
 
     public String toString(){
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy/HH:mm:ss", Locale.getDefault());

@@ -44,8 +44,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
 
 
@@ -97,6 +99,7 @@ public class Analysis extends Fragment {
         chart.setBackgroundColor(Color.WHITE);  // set chart's background color to white
         chart.setExtraOffsets(0f, 10f, 0f, 10f);  // modify the offset values here
         file = new File(getContext().getExternalFilesDir(null), "bluetoothData.txt");
+        MainActivity mainActivity = (MainActivity) requireActivity();
 
 
         // Initialize RecyclerView and its adapter
@@ -115,7 +118,7 @@ public class Analysis extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedExercise = parent.getItemAtPosition(position).toString();
                 // When an exercise is selected, re-populate the table data and notify the adapter
-                populateTableData();
+                populateTableData(mainActivity.workoutViewModel.vmaxData().getValue());
                 exerciseDataAdapter.notifyDataSetChanged();
             }
 
@@ -382,8 +385,25 @@ public class Analysis extends Fragment {
         }
     }
 
-    void populateTableData() {
+    void populateTableData(HashMap<String, HashMap<String, Double>> exercisesData) {
         exerciseDataList.clear();
+        HashMap<String, Double> innerMap = exercisesData.get(selectedExercise);
+        if (innerMap != null) {
+            for (Map.Entry<String, Double> entry : innerMap.entrySet()) {
+                String percentageRM = entry.getKey();
+                Double peakVelocity = entry.getValue();
+                // Assuming load value and tag to be default, as not available in the new data structure.
+                float load = 0.0f;
+                String tag = "load_vel_profile";
+                if (selectedExercise.equals("Poteg na Roke") && tag.equals("daily_readiness")) {
+                    continue; // Skip entries with "daily_readiness" for "Poteg na Roke"
+                }
+                if (tag.equals("load_vel_profile")) {
+                    exerciseDataList.add(new ExerciseData(peakVelocity.floatValue(), load, percentageRM));
+                }
+            }
+        }
+        /*
         try {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
@@ -406,5 +426,7 @@ public class Analysis extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
+
     }
 }
