@@ -13,7 +13,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="110dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:layout_margin="10dp"
             android:background="@drawable/rounded_background">
@@ -25,33 +26,47 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Default Units"
+                android:text="Selected Units"
                 android:layout_margin="10dp"
                 />
-            <Spinner
-                android:id="@+id/spinner"
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:layout_marginStart="10dp"
-                />
+                android:layout_height="wrap_content"
+                android:background="@drawable/rectangle_border"
+                android:layout_marginStart="10dp">
+
+                <Spinner
+                    android:id="@+id/spinner_units"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    />
+
+            </FrameLayout>
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="0dp"
+            android:layout_weight="4"
             android:orientation="vertical"
             android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
             android:paddingBottom="10dp"
             android:background="@drawable/rounded_background">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/search_button"
+                android:layout_margin="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/search_button"
-                android:layout_gravity="center"
-                />
+                android:background="@drawable/button_background"
+                android:textColor="@color/white"
+                android:layout_gravity="center" />
 
             <ListView
                 android:id="@+id/devices_list_view"
@@ -60,14 +75,16 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginEnd="10dp"
                 android:layout_weight="1"
-                android:background="@color/purple_200"
-                android:divider="@android:color/darker_gray"
-                android:dividerHeight="0.5dp" />
+                android:background="@color/lighter_blue"
+                android:textColor="@color/white"
+                android:divider="@color/white"
+                android:dividerHeight="1dp" />
         </LinearLayout>
-
+        <!--
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
             android:layout_margin="10dp"
             android:background="@drawable/rounded_background">
@@ -79,12 +96,13 @@
                 android:layout_gravity="center"/>
 
         </LinearLayout>
+        -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_margin="10dp"
             android:background="@drawable/rounded_background">
 
             <TextView
@@ -96,7 +114,13 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="db5086@student.uni-lj.si"
+                android:text="@string/student1_email"
+                android:layout_gravity="center"
+                android:background="@drawable/rounded_background"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/student2_email"
                 android:layout_gravity="center"
                 android:background="@drawable/rounded_background"/>
 

@@ -4,11 +4,11 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +27,7 @@ public class Workout extends Fragment {
 
     private BluetoothData viewModel;
 
-    private WorkoutViewModel workoutViewModel;
+    private AppViewModel appViewModel;
 
     private WorkoutSession workoutSession;
 
@@ -77,13 +77,13 @@ public class Workout extends Fragment {
 
         // check if workout is in progress
         MainActivity mainActivity = (MainActivity) requireActivity();
-        mainActivity.workoutViewModel.isWorkoutInProgress().observe(getViewLifecycleOwner(), inProgress -> {
+        mainActivity.appViewModel.isWorkoutInProgress().observe(getViewLifecycleOwner(), inProgress -> {
 
             if (inProgress){
                 btnNewWorkout.setVisibility(View.GONE);
 
                 // restore workout session when workout is in progress
-                workoutSession = mainActivity.workoutViewModel.getWorkoutSession().getValue();
+                workoutSession = mainActivity.appViewModel.getWorkoutSession().getValue();
 
                 // if workout list is not empty display lifts on screen
                 if (workoutSession.getLifts().size() > 0){
@@ -113,8 +113,8 @@ public class Workout extends Fragment {
 
                 // create new workout session and add it to workout view model
                 workoutSession = new WorkoutSession();
-                mainActivity.workoutViewModel.setWorkoutSession(workoutSession);
-                mainActivity.workoutViewModel.startWorkout();
+                mainActivity.appViewModel.setWorkoutSession(workoutSession);
+                mainActivity.appViewModel.startWorkout();
 
                 // create observer for received bluetooth data
 
@@ -128,7 +128,7 @@ public class Workout extends Fragment {
                             String exercise = lift.getExercise();
                             String percentage = lift.getPercentage();
                             Double peakVelocity = lift.getPeakVelocity();
-                            Double vmax = mainActivity.workoutViewModel.vmaxData().getValue().get(exercise).get(percentage);
+                            Double vmax = mainActivity.appViewModel.vmaxData().getValue().get(exercise).get(percentage)[0];
                             if (lift.getTag().equals("workout_lift")){
                                 int percentToMax = (int) ((peakVelocity / vmax ) * 100);
                                 lift.setPercentToMax(percentToMax);
@@ -149,20 +149,20 @@ public class Workout extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (mainActivity.workoutViewModel.isWorkoutInProgress().getValue()){
+                if (mainActivity.appViewModel.isWorkoutInProgress().getValue()){
                     // write workout to file
                     File appSpecificExternalDir = getContext().getExternalFilesDir(null);
                     workoutSession.writeToFile("bluetoothData.txt", appSpecificExternalDir.getAbsolutePath());
-                    mainActivity.workoutViewModel.readDataFromFile(getContext(),"bluetoothData.txt");
+                    mainActivity.appViewModel.readDataFromFile(getContext(),"bluetoothData.txt");
 
                     // delete lift view
                     LinearLayout parentLayout = view.findViewById(R.id.workouts_layout);
                     parentLayout.removeAllViews();
 
-                    mainActivity.workoutViewModel.setWorkoutSession(null);
+                    mainActivity.appViewModel.setWorkoutSession(null);
 
                     // set workout to false
-                    mainActivity.workoutViewModel.finishWorkout();
+                    mainActivity.appViewModel.finishWorkout();
 
                     // make new workout button visible
                     btnNewWorkout.setVisibility(View.VISIBLE);
@@ -193,6 +193,13 @@ public class Workout extends Fragment {
 
         if (percentToMax > 0){
             ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setText(String.valueOf(percentToMax));
+        }
+        if (percentToMax >= 95){
+            ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.circle_green));
+        } else if (percentToMax >= 80) {
+            ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.circle_orange));
+        } else {
+            ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.circle_red));
         }
 
 

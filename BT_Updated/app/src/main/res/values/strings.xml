@@ -4,7 +4,7 @@
     <string name="analysis">ANALYSIS</string>
     <string name="settings">SETTINGS</string>
     <string name="search_button">Search Paired Devices</string>
-    <string name="app_settings">SETTINGS</string>
+    <string name="app_settings">Settings</string>
 
     <string-array name="exercises_array">
         <item>Poteg</item>
@@ -14,8 +14,14 @@
         <item>Nalog na Moc</item>
         <item>Nalog na Roke</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
+
+    <string-array name="units">
+        <item>Kg</item>
+        <item>Lbs</item>
+    </string-array>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="new_workout">NEW WORKOUT</string>
     <string name="bluetooth_status">NOT CONNECTED</string>
+    <string name="student2_email">jp3725@student.uni-lj.si</string>
+    <string name="student1_email">db5086@student.uni-lj.si</string>
 </resources>

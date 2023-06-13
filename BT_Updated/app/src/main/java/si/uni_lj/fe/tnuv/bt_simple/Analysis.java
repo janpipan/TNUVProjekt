@@ -43,12 +43,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.TreeMap;
 
 
 public class Analysis extends Fragment {
@@ -118,7 +120,7 @@ public class Analysis extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedExercise = parent.getItemAtPosition(position).toString();
                 // When an exercise is selected, re-populate the table data and notify the adapter
-                populateTableData(mainActivity.workoutViewModel.vmaxData().getValue());
+                populateTableData(mainActivity.appViewModel.vmaxData().getValue());
                 exerciseDataAdapter.notifyDataSetChanged();
             }
 
@@ -354,7 +356,13 @@ public class Analysis extends Fragment {
             if (getItemViewType(position) == HEADER_VIEW_TYPE) {
                 // Bind header data
                 viewHolder.peakVelocityView.setText("Vmax [m/s]");
-                viewHolder.loadView.setText("Load [kg]");
+                MainActivity mainActivity = (MainActivity) requireActivity();
+                if (mainActivity.appViewModel.units().getValue() == 0){
+                    viewHolder.loadView.setText("Load [Kg]");
+                } else {
+                    viewHolder.loadView.setText("Load [Lbs]");
+                }
+
                 viewHolder.percentageRMView.setText("%RM");
             } else {
                 // Bind exercise data
@@ -385,21 +393,35 @@ public class Analysis extends Fragment {
         }
     }
 
-    void populateTableData(HashMap<String, HashMap<String, Double>> exercisesData) {
+    void populateTableData(HashMap<String, HashMap<String, Double[]>> exercisesData) {
         exerciseDataList.clear();
-        HashMap<String, Double> innerMap = exercisesData.get(selectedExercise);
+        HashMap<String, Double[]> innerMap = exercisesData.get(selectedExercise);
         if (innerMap != null) {
-            for (Map.Entry<String, Double> entry : innerMap.entrySet()) {
-                String percentageRM = entry.getKey();
-                Double peakVelocity = entry.getValue();
-                // Assuming load value and tag to be default, as not available in the new data structure.
-                float load = 0.0f;
-                String tag = "load_vel_profile";
-                if (selectedExercise.equals("Poteg na Roke") && tag.equals("daily_readiness")) {
-                    continue; // Skip entries with "daily_readiness" for "Poteg na Roke"
+            // Create a TreeMap with a custom comparator
+            TreeMap<String, Double[]> sortedInnerMap = new TreeMap<>(new Comparator<String>() {
+                @Override
+                public int compare(String o1, String o2) {
+                    // Extract the numeric part from the keys and compare them
+                    int percentage1 = Integer.parseInt(o1.substring(0, o1.indexOf('%')));
+                    int percentage2 = Integer.parseInt(o2.substring(0, o2.indexOf('%')));
+                    return Integer.compare(percentage1, percentage2);
                 }
-                if (tag.equals("load_vel_profile")) {
-                    exerciseDataList.add(new ExerciseData(peakVelocity.floatValue(), load, percentageRM));
+            });
+            sortedInnerMap.putAll(innerMap);
+            for (Map.Entry<String, Double[]> entry : sortedInnerMap.entrySet()) {
+                String percentageRM = entry.getKey();
+                Double[] values = entry.getValue();
+                // Ensure that there are two values for each percentageRM
+                if (values.length == 2) {
+                    Double peakVelocity = values[0];
+                    Double load = values[1];
+                    String tag = "load_vel_profile";
+                    if (selectedExercise.equals("Poteg na Roke") && tag.equals("daily_readiness")) {
+                        continue; // Skip entries with "daily_readiness" for "Poteg na Roke"
+                    }
+                    if (tag.equals("load_vel_profile")) {
+                        exerciseDataList.add(new ExerciseData(peakVelocity.floatValue(), load.floatValue(), percentageRM));
+                    }
                 }
             }
         }

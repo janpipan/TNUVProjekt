@@ -113,15 +113,13 @@
                         android:orientation="vertical"
                         android:gravity="center">
 
-                        <View
-                            android:layout_width="75dp"
-                            android:layout_height="75dp"
-                            android:background="@drawable/circle"/>
-
                         <TextView
                             android:id="@+id/percentage_circle"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
+                            android:layout_width="75dp"
+                            android:layout_height="75dp"
+                            android:gravity="center"
+                            android:background="@drawable/circle_green"/>
+
 
                     </LinearLayout>
 
