@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothSocket;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 public class BluetoothData extends ViewModel {
@@ -12,10 +13,12 @@ public class BluetoothData extends ViewModel {
 
     private final MutableLiveData<Boolean> connected;
 
+
     public BluetoothData(){
         connected = new MutableLiveData<>();
         connected.setValue(false);
     }
+
 
     public void startConnection(){connected.postValue(true);}
 
@@ -40,6 +43,6 @@ public class BluetoothData extends ViewModel {
     }
 
     public void clearReceivedData(){
-        receivedData.postValue(null);
+        receivedData.setValue(null);
     }
 }
