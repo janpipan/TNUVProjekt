@@ -23,12 +23,15 @@ public class AppViewModel extends ViewModel {
     private final MutableLiveData<Integer> selectedUnits = new MutableLiveData<>();
     private final MutableLiveData<HashMap<String, HashMap<String, Double[]>>> vmax = new MutableLiveData<>();
 
+    private final MutableLiveData<Boolean> pairedDevicesDisplayed = new MutableLiveData<>();
+
     public AppViewModel(){
         initializeData();
     }
 
     public void initializeData(){
         selectedUnits.setValue(0);
+        pairedDevicesDisplayed.setValue(false);
         HashMap<String, HashMap<String, Double[]>> initialData = new HashMap<>();
 
         List<String> exercises = Arrays.asList("Poteg", "Poteg na Moc", "Poteg na Roke", "Nalog", "Nalog na Roke", "Nalog na Moc");
@@ -143,6 +146,10 @@ public class AppViewModel extends ViewModel {
     public void finishWorkout() {
         workoutInProgress.setValue(false);
     }
+
+    public void setDevicesDisplayed(Boolean value){pairedDevicesDisplayed.postValue(value);}
+
+    public LiveData<Boolean> arePairedDevicesDisplayed(){return pairedDevicesDisplayed;}
 
     public LiveData<Boolean> isWorkoutInProgress() {
         return workoutInProgress;

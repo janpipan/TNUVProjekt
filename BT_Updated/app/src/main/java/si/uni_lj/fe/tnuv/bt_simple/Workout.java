@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ public class Workout extends Fragment {
     private MainActivity mainActivity;
 
     private Observer<String> myObserver;
+    private boolean isObserverSet = false;
 
 
     public Workout() {
@@ -55,6 +57,7 @@ public class Workout extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_workout, container, false);
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -90,6 +93,7 @@ public class Workout extends Fragment {
             if (inProgress){
                 btnNewWorkout.setVisibility(View.GONE);
 
+
                 // restore workout session when workout is in progress
                 workoutSession = mainActivity.appViewModel.getWorkoutSession().getValue();
 
@@ -97,13 +101,44 @@ public class Workout extends Fragment {
                 if (workoutSession.getLifts().size() > 0){
                     for (Lift lift: workoutSession.getLifts()){
                         if (lift.getPercentToMax() > 0){
-                            addLiftView(view, lift, lift.getPercentToMax(), mainActivity.appViewModel.units().getValue(),"fragmentChange");
+                            addLiftView(view, lift, lift.getPercentToMax(), mainActivity.appViewModel.units().getValue());
                         } else {
-                            addLiftView(view, lift, 0,mainActivity.appViewModel.units().getValue(),"fragmentChange");
+                            addLiftView(view, lift, 0,mainActivity.appViewModel.units().getValue());
                         }
 
                     }
                 }
+                Log.d("workout", String.valueOf(isObserverSet));
+                if (!isObserverSet){
+                    myObserver = new Observer<String>() {
+                        @Override
+                        public void onChanged(String s) {
+                            if (s != null && !s.isEmpty()){
+                                Lift lift = new Lift(s);
+                                workoutSession.addLift(lift);
+                                String exercise = lift.getExercise();
+                                String percentage = lift.getPercentage();
+                                Double peakVelocity = lift.getPeakVelocity();
+                                Double vmax = mainActivity.appViewModel.vmaxData().getValue().get(exercise).get(percentage)[0];
+                                if (vmax != 0 && lift.getTag().equals("workout_lift")){
+                                    int percentToMax = (int) ((peakVelocity / vmax ) * 100);
+                                    lift.setPercentToMax(percentToMax);
+                                    addLiftView(view, lift, percentToMax, mainActivity.appViewModel.units().getValue());
+                                } else {
+                                    addLiftView(view, lift, 0, mainActivity.appViewModel.units().getValue());
+                                }
+
+                                //Toast.makeText(requireContext(), s, Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    };
+
+                    viewModel.clearReceivedData();
+                    viewModel.getReceivedData().observe(getViewLifecycleOwner(), myObserver);
+                    isObserverSet = true;
+                }
+
+
             }
         });
 
@@ -128,33 +163,35 @@ public class Workout extends Fragment {
 
                 // create observer for received bluetooth data
 
-                myObserver = new Observer<String>() {
-                    @Override
-                    public void onChanged(String s) {
-                        if (s != null && !s.isEmpty()){
-                            Lift lift = new Lift(s);
-                            workoutSession.addLift(lift);
-                            String exercise = lift.getExercise();
-                            String percentage = lift.getPercentage();
-                            Double peakVelocity = lift.getPeakVelocity();
-                            Double vmax = mainActivity.appViewModel.vmaxData().getValue().get(exercise).get(percentage)[0];
-                            if (vmax != 0 && lift.getTag().equals("workout_lift")){
-                                int percentToMax = (int) ((peakVelocity / vmax ) * 100);
-                                lift.setPercentToMax(percentToMax);
-                                addLiftView(view, lift, percentToMax, mainActivity.appViewModel.units().getValue(),"dataReceiver");
-                            } else {
-                                addLiftView(view, lift, 0, mainActivity.appViewModel.units().getValue(),"dataReceiver");
+                if (!isObserverSet){
+                    myObserver = new Observer<String>() {
+                        @Override
+                        public void onChanged(String s) {
+                            if (s != null && !s.isEmpty()){
+                                Lift lift = new Lift(s);
+                                workoutSession.addLift(lift);
+                                String exercise = lift.getExercise();
+                                String percentage = lift.getPercentage();
+                                Double peakVelocity = lift.getPeakVelocity();
+                                Double vmax = mainActivity.appViewModel.vmaxData().getValue().get(exercise).get(percentage)[0];
+                                if (vmax != 0 && lift.getTag().equals("workout_lift")){
+                                    int percentToMax = (int) ((peakVelocity / vmax ) * 100);
+                                    lift.setPercentToMax(percentToMax);
+                                    addLiftView(view, lift, percentToMax, mainActivity.appViewModel.units().getValue());
+                                } else {
+                                    addLiftView(view, lift, 0, mainActivity.appViewModel.units().getValue());
+                                }
+
+                                //Toast.makeText(requireContext(), s, Toast.LENGTH_SHORT).show();
                             }
-
-                            //Toast.makeText(requireContext(), s, Toast.LENGTH_SHORT).show();
                         }
-                    }
-                };
+                    };
 
+                    viewModel.clearReceivedData();
+                    viewModel.getReceivedData().observe(getViewLifecycleOwner(), myObserver);
+                    isObserverSet = true;
+                }
 
-
-                viewModel.clearReceivedData();
-                viewModel.getReceivedData().observe(getViewLifecycleOwner(), myObserver);
             }
         });
         // button for finishing workout
@@ -188,8 +225,7 @@ public class Workout extends Fragment {
         });
     }
 
-    private void addLiftView(View view, Lift lift, int percentToMax, int selectedUnits, String displayedFrom){
-        Toast.makeText(requireContext(), displayedFrom, Toast.LENGTH_SHORT).show();
+    private void addLiftView(View view, Lift lift, int percentToMax, int selectedUnits){
         String units;
         if (selectedUnits == 0){
             units = " Kg";
@@ -210,7 +246,7 @@ public class Workout extends Fragment {
         ((TextView) newWorkout.findViewById(R.id.exercise)).setText(lift.getExercise());
         ((TextView) newWorkout.findViewById(R.id.weight)).setText(String.valueOf(lift.getWeight()) + units);
         ((TextView) newWorkout.findViewById(R.id.percentage)).setText(String.valueOf(lift.getPercentage()));
-        ((TextView) newWorkout.findViewById(R.id.peak_velocity)).setText("Peak velocity" + String.valueOf(lift.getPeakVelocity()));
+        ((TextView) newWorkout.findViewById(R.id.peak_velocity)).setText("Peak velocity: " + String.valueOf(lift.getPeakVelocity()));
         ((TextView) newWorkout.findViewById(R.id.tag)).setText(lift.getTag());
 
         EditText commentEditText = newWorkout.findViewById(R.id.comment);
@@ -234,6 +270,8 @@ public class Workout extends Fragment {
 
         if (percentToMax > 0){
             ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setText(String.valueOf(percentToMax) + " %");
+        } else {
+            ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setVisibility(View.GONE);
         }
         if (percentToMax >= 95){
             ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.circle_green));
@@ -243,9 +281,7 @@ public class Workout extends Fragment {
             ((TextView) newWorkout.findViewById(R.id.percentage_circle)).setBackground(ContextCompat.getDrawable(getActivity(),R.drawable.circle_red));
         }
 
-
         // add view to parent layout
-
         parentLayout.addView(newWorkout);
     }
 

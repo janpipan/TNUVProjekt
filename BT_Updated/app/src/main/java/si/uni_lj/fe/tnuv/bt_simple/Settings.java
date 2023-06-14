@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -58,7 +59,7 @@ public class Settings extends Fragment implements ConnectionStatusListener{
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         ListView devicesListView = view.findViewById(R.id.devices_list_view);
         viewModel = new ViewModelProvider(requireActivity()).get(BluetoothData.class);
-        deviceListAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1);
+        deviceListAdapter = new ArrayAdapter<>(requireContext(), R.layout.list_item);
         devicesListView.setAdapter(deviceListAdapter);
 
         devicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -71,7 +72,19 @@ public class Settings extends Fragment implements ConnectionStatusListener{
                 connectThread.start();
             }
         });
-        displayPairedDevices();
+        Button btnSearchDevices = view.findViewById(R.id.search_button);
+        btnSearchDevices.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainActivity.appViewModel.setDevicesDisplayed(true);
+                displayPairedDevices();
+            }
+        });
+
+        if (mainActivity.appViewModel.arePairedDevicesDisplayed().getValue()){
+            displayPairedDevices();
+        }
+
 
         Spinner spinner = view.findViewById(R.id.spinner_units);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
@@ -106,6 +119,7 @@ public class Settings extends Fragment implements ConnectionStatusListener{
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
                 deviceListAdapter.add(device.getName() + " - " + device.getAddress());
+                //deviceListAdapter.add(device.getName());
             }
         } else {
             Toast.makeText(requireContext(), "No paired devices found", Toast.LENGTH_SHORT).show();
